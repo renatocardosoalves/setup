@@ -8,7 +8,7 @@ body:
     attributes:
       label: Nome da aplicação
       description: Nome que será usado para criar o repositório
-      placeholder: ex: api-pedidos
+      placeholder: api-pedidos
     validations:
       required: true
 
