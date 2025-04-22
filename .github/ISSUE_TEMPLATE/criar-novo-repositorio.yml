@@ -28,7 +28,7 @@ body:
     attributes:
       label: Descrição do projeto
       description: Breve descrição do propósito do repositório
-      placeholder: Ex: API para controle de pagamentos
+      placeholder: API para controle de pagamentos
 
   - type: dropdown
     id: visibilidade
