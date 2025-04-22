@@ -1,0 +1,42 @@
+name: Criar novo repositório
+description: Cria um novo repositório a partir de um template
+title: "[Novo Repositório] "
+labels: ["automacao", "novo-repo"]
+body:
+  - type: input
+    id: nome_aplicacao
+    attributes:
+      label: Nome da aplicação
+      description: Nome que será usado para criar o repositório
+      placeholder: ex: api-pedidos
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tipo_repositorio
+    attributes:
+      label: Tipo de repositório
+      description: Escolha se é uma aplicação ou infraestrutura
+      options:
+        - aplicacao
+        - infraestrutura
+    validations:
+      required: true
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição do projeto
+      description: Breve descrição do propósito do repositório
+      placeholder: Ex: API para controle de pagamentos
+
+  - type: dropdown
+    id: visibilidade
+    attributes:
+      label: Visibilidade do repositório
+      description: Escolha se o repositório será público ou privado
+      options:
+        - publico
+        - privado
+    validations:
+      required: true
