@@ -1,0 +1,57 @@
+name: Create Repo from Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create_repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse issue fields
+        id: parse
+        run: |
+          BODY="${{ github.event.issue.body }}"
+
+          NOME_APLICACAO=$(echo "$BODY" | grep '### Nome da aplicação' -A 1 | tail -n 1 | xargs)
+          TIPO_REPOSITORIO=$(echo "$BODY" | grep '### Tipo de repositório' -A 1 | tail -n 1 | xargs)
+          DESCRICAO=$(echo "$BODY" | grep '### Descrição do projeto' -A 1 | tail -n 1 | xargs)
+          VISIBILIDADE=$(echo "$BODY" | grep '### Visibilidade do repositório' -A 1 | tail -n 1 | xargs)
+
+          if [[ "$TIPO_REPOSITORIO" == "infraestrutura" ]]; then
+            NOME_REPO="infra-$NOME_APLICACAO"
+          else
+            NOME_REPO="app-$NOME_APLICACAO"
+          fi
+
+          echo "NOME_APLICACAO=$NOME_APLICACAO" >> $GITHUB_OUTPUT
+          echo "TIPO_REPOSITORIO=$TIPO_REPOSITORIO" >> $GITHUB_OUTPUT
+          echo "DESCRICAO=$DESCRICAO" >> $GITHUB_OUTPUT
+          echo "NOME_REPO=$NOME_REPO" >> $GITHUB_OUTPUT
+          echo "VISIBILIDADE=$VISIBILIDADE" >> $GITHUB_OUTPUT
+
+      - name: Select template
+        id: template
+        run: |
+          if [[ "${{ steps.parse.outputs.TIPO_REPOSITORIO }}" == "infraestrutura" ]]; then
+            echo "TEMPLATE_REPO=renatocardosoalves/template-infraestrutura" >> $GITHUB_OUTPUT
+          else
+            echo "TEMPLATE_REPO=renatocardosoalves/template-aplicacao" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create repository from template
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          VIS_FLAG=""
+          if [[ "${{ steps.parse.outputs.VISIBILIDADE }}" == "privado" ]]; then
+            VIS_FLAG="--private"
+          else
+            VIS_FLAG="--public"
+          fi
+
+          gh repo create "renatocardosoalves/${{ steps.parse.outputs.NOME_REPO }}" \
+            --template ${{ steps.template.outputs.TEMPLATE_REPO }} \
+            $VIS_FLAG \
+            --description "${{ steps.parse.outputs.DESCRICAO }}"
